@@ -9,7 +9,7 @@
   body { font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif; background: #f4f5f7; color: #1a1a2e; min-height: 100vh; }
 
   /* Header */
-  .header { background: #1e1e2e; padding: 20px 32px; border-bottom: 3px solid #3a3a4e; display: flex; align-items: center; justify-content: space-between; }
+  .header { background: #1e1e2e; padding: 20px 32px; border-bottom: 3px solid #3a3a4e; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 60; }
   .header-left h1 { font-size: 20px; font-weight: 700; color: #ffffff; letter-spacing: 0.06em; }
   .header-left .date { font-size: 13px; color: #9a9ab0; margin-top: 4px; }
   .header-right { display: flex; gap: 12px; align-items: center; }
@@ -131,16 +131,17 @@
   /* モバイル対応 (〜768px) */
   /* ===================== */
   @media (max-width: 768px) {
-    .header { padding: 14px 16px; flex-wrap: wrap; gap: 8px; }
-    .header-left h1 { font-size: 16px; }
+    .header { padding: 14px 16px; flex-wrap: nowrap; gap: 8px; align-items: center; }
+    .header-left h1 { font-size: 15px; }
     .header-left .date { font-size: 11px; }
-    .header-right { gap: 6px; }
-    .badge { padding: 4px 10px; font-size: 11px; }
+    .header-right { gap: 6px; flex-shrink: 0; }
+    .badge { display: none; }
+    .header-right button { width: 38px; height: 38px; border-radius: 10px; font-size: 18px; padding: 0; display: flex; align-items: center; justify-content: center; }
 
     /* タブ → 下部固定ナビ */
     .tabs {
       position: fixed; bottom: 0; left: 0; right: 0;
-      padding: 0; z-index: 50;
+      padding: 0; z-index: 40;
       background: #ffffff;
       border-top: 1.5px solid #e2e4e9;
       border-bottom: none;
@@ -224,21 +225,10 @@
     <div class="badge">完了 <span id="doneCount">0</span></div>
     <div class="badge">本日 <span id="todayCount">0</span></div>
     <span id="syncStatus" style="font-size:12px;display:none;"></span>
-    <button onclick="pullFromCloud()" style="background:#2e2e40;border:1px solid #3a3a4e;color:#9a9ab0;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;" title="クラウドから最新データを取得">🔄</button>
-    <button onclick="showGasSetup()" style="background:#2e2e40;border:1px solid #3a3a4e;color:#9a9ab0;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;" title="GAS URL設定">⚙️</button>
   </div>
 </div>
 
-<!-- GAS設定パネル -->
-<div id="gasSetupPanel" style="display:none;background:#1e1e2e;padding:16px 32px;border-bottom:1px solid #3a3a4e;">
-  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-    <span style="font-size:13px;color:#9a9ab0;font-weight:600;">⚙️ Google Apps Script URL</span>
-    <input id="gasUrlInput" type="text" placeholder="https://script.google.com/macros/s/xxxxx/exec"
-      style="flex:1;min-width:280px;background:#0f1117;border:1.5px solid #3a3a4e;border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;" />
-    <button onclick="saveGasUrl()" style="background:#1e1e2e;border:1.5px solid #fff;color:#fff;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;">保存して同期</button>
-    <span style="font-size:11px;color:#6b7280;">GASをデプロイしたURLを貼り付けてください</span>
-  </div>
-</div>
+
 
 <div class="tabs">
   <div class="tab active" onclick="switchTab('matrix')"><span class="tab-icon">📊</span>マトリクス</div>
@@ -256,6 +246,26 @@
     <button class="filter-btn yuen" onclick="setFilter('YUEN', this)">結縁</button>
     <button class="filter-btn personal" onclick="setFilter('個人', this)">個人</button>
     <button class="add-btn" onclick="openModal()">＋ タスク追加</button>
+    <button onclick="pullFromCloud()" style="background:#ffffff;border:1.5px solid #d1d5db;color:#6b7280;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;" title="クラウドから最新データを取得">🔄</button>
+    <button onclick="showGasSetup()" style="background:#ffffff;border:1.5px solid #d1d5db;color:#6b7280;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;" title="GAS URL設定">⚙️</button>
+  </div>
+  <!-- GAS設定パネル（フィルターバーの直下）-->
+  <div id="gasSetupPanel" style="display:none;background:#1e1e2e;border-radius:12px;padding:20px;margin-bottom:16px;border:1.5px solid #3a3a4e;">
+    <div style="font-size:14px;color:#ffffff;font-weight:700;margin-bottom:12px;">⚙️ Google Apps Script URL設定</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <input id="gasUrlInput" type="url" placeholder="https://script.google.com/macros/s/xxxxx/exec"
+        style="flex:1;min-width:200px;background:#0f1117;border:1.5px solid #3a3a4e;border-radius:8px;padding:10px 12px;color:#fff;font-size:16px;" />
+      <button onclick="saveGasUrl()" style="background:#ffffff;border:none;color:#1e1e2e;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;">保存して同期</button>
+    </div>
+    <div style="font-size:11px;color:#6b7280;margin-top:8px;">GASをデプロイしたURLを貼り付けてください</div>
+  </div>
+  <div class="filter-bar" style="margin-top:-10px;">
+    <span style="font-size:11px;color:#6b7280;font-weight:600;">優先度：</span>
+    <button class="filter-btn" onclick="setQuadrantFilter('all', this)" id="qf-all" style="background:#1e1e2e;border-color:#1e1e2e;color:#fff;">すべて</button>
+    <button class="filter-btn" onclick="setQuadrantFilter('q1', this)" id="qf-q1" style="border-color:#f5c0c0;color:#c0392b;">🔴 重要×緊急</button>
+    <button class="filter-btn" onclick="setQuadrantFilter('q2', this)" id="qf-q2" style="border-color:#b8cce8;color:#1e3a6e;">🔵 重要×非緊急</button>
+    <button class="filter-btn" onclick="setQuadrantFilter('q3', this)" id="qf-q3" style="border-color:#d5bef5;color:#5b21b6;">🟣 非重要×緊急</button>
+    <button class="filter-btn" onclick="setQuadrantFilter('q4', this)" id="qf-q4" style="border-color:#d1d5db;color:#6b7280;">⚪ 非重要×非緊急</button>
   </div>
 
   <!-- Matrix View -->
@@ -350,6 +360,10 @@
           </select>
         </div>
       </div>
+      <div style="display:flex;gap:10px;margin-bottom:10px;">
+        <button onclick="selectAllReflect(true)" style="background:#f3f4f6;border:1.5px solid #e2e4e9;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-weight:600;color:#1a1a2e;">✅ 全選択</button>
+        <button onclick="selectAllReflect(false)" style="background:#f3f4f6;border:1.5px solid #e2e4e9;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-weight:600;color:#6b7280;">☐ 全解除</button>
+      </div>
       <div class="reflect-tasks" id="reflectTaskList"></div>
       <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
         <button class="reflect-btn" id="reflectBtn" onclick="reflectToCalendar()">📅 選択したタスクをカレンダーに反映</button>
@@ -435,6 +449,29 @@ let GAS_URL = localStorage.getItem('gasUrl') || '';
 // ========== State ==========
 let tasks = JSON.parse(localStorage.getItem('koNiiTasks') || 'null') || initialTasks;
 let currentFilter = 'all';
+let currentQuadrantFilter = 'all';
+
+function setQuadrantFilter(q, btn) {
+  currentQuadrantFilter = q;
+  document.querySelectorAll('[id^="qf-"]').forEach(b => {
+    b.style.background = '';
+    b.style.color = b.dataset.origColor || '';
+  });
+  if (q === 'all') {
+    btn.style.background = '#1e1e2e';
+    btn.style.borderColor = '#1e1e2e';
+    btn.style.color = '#fff';
+  } else {
+    const colorMap = { q1:'#fde8e8', q2:'#e8eef8', q3:'#f0eafc', q4:'#f3f4f6' };
+    btn.style.background = colorMap[q] || '#f3f4f6';
+  }
+  render();
+}
+
+function selectAllReflect(checked) {
+  document.querySelectorAll('#reflectTaskList input[type=checkbox]')
+    .forEach(cb => cb.checked = checked);
+}
 let currentTab = 'matrix';
 let isSyncing = false;
 
@@ -522,8 +559,11 @@ function toDateStr(d) {
 
 // ========== Filter ==========
 function getFiltered() {
-  if (currentFilter === 'all') return tasks;
-  return tasks.filter(t => t.entity === currentFilter);
+  let result = currentFilter === 'all' ? tasks : tasks.filter(t => t.entity === currentFilter);
+  if (currentQuadrantFilter !== 'all') {
+    result = result.filter(t => getQuadrant(t) === currentQuadrantFilter);
+  }
+  return result;
 }
 
 function setFilter(f, btn) {
@@ -685,6 +725,7 @@ async function reflectToCalendar() {
   const time = document.getElementById('reflectTime').value;
 
   if (!date) { alert('反映日を選択してください'); return; }
+  if (!GAS_URL) { alert('先に⚙️からGAS URLを設定してください'); return; }
 
   const checked = [...document.querySelectorAll('#reflectTaskList input[type=checkbox]:checked')];
   if (checked.length === 0) { alert('タスクを選択してください'); return; }
@@ -693,22 +734,48 @@ async function reflectToCalendar() {
   const selectedTasks = tasks.filter(t => selectedIds.includes(t.id));
 
   btn.disabled = true;
-  btn.textContent = '⏳ 反映中...';
+  btn.textContent = '⏳ カレンダーに登録中...';
   status.style.display = 'none';
 
-  // Build task list string for Claude
-  const taskListStr = selectedTasks.map((t, i) => {
-    const startHour = parseInt(time.split(':')[0]) + i;
-    return `・${t.name}（${t.entity}、重要度:${t.importance==='high'?'高':'低'}、緊急度:${t.urgency==='high'?'高':'低'}）→ ${date} ${String(startHour).padStart(2,'0')}:00〜1時間`;
-  }).join('\n');
+  const [baseHour, baseMin] = time.split(':').map(Number);
+  const calendarEvents = selectedTasks.map((t, i) => {
+    const h = String(baseHour + i).padStart(2,'0');
+    const m = String(baseMin).padStart(2,'0');
+    const start = new Date(date + 'T' + h + ':' + m + ':00');
+    const end   = new Date(start.getTime() + 60 * 60 * 1000);
+    return {
+      title: '[' + t.entity + '] ' + t.name,
+      startTime: start.toISOString(),
+      endTime:   end.toISOString(),
+      importance: t.importance,
+      urgency:    t.urgency,
+      description: ['重要度:', (t.importance==='high'?'高':'低'), '/ 緊急度:', (t.urgency==='high'?'高':'低'), (t.note || '')].join(' ')
+    };
+  });
 
-  // Send to Claude to reflect to Google Calendar
-  window.sendPrompt(`以下のタスクをGoogleカレンダーに登録してください。\n\n${taskListStr}\n\n各タスクを指定の日時で1時間のイベントとして登録してください。`);
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ calendarEvents })
+    });
+    const json = await res.json();
+    if (json.status === 'ok') {
+      const ok = (json.calendarResults || []).filter(r => r.status === 'ok').length;
+      status.textContent = ok + '件をGoogleカレンダーに登録しました！';
+      status.style.color = '#059669';
+    } else {
+      status.textContent = 'エラー: ' + json.message;
+      status.style.color = '#dc2626';
+    }
+  } catch(e) {
+    status.textContent = '通信エラー。GAS URLを確認してください。';
+    status.style.color = '#dc2626';
+  }
 
+  status.style.display = 'block';
   btn.disabled = false;
   btn.textContent = '📅 選択したタスクをカレンダーに反映';
-  status.textContent = `✅ ${selectedTasks.length}件を智慧に送信しました！チャットで確認してください。`;
-  status.style.display = 'block';
 }
 
 // ========== Keyboard ==========
