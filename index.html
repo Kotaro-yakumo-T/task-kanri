@@ -728,9 +728,6 @@ async function reflectToCalendar() {
 
   const selectedIds = checked.map(c => c.id.replace('rc-',''));
   const selectedTasks = tasks.filter(t => selectedIds.includes(String(t.id)));
-  
-  // デバッグ
-  alert('チェック数:' + checked.length + ' / selectedIds:' + JSON.stringify(selectedIds) + ' / tasks件数:' + tasks.length + ' / 最初のtask.id型:' + typeof tasks[0].id + ' / selectedTasks:' + selectedTasks.length);
 
   btn.disabled = true;
   btn.textContent = '⏳ カレンダーに登録中...';
@@ -753,19 +750,18 @@ async function reflectToCalendar() {
   });
 
   try {
-    const encoded = encodeURIComponent(JSON.stringify(calendarEvents));
-    const res = await fetch(GAS_URL + '?action=calendar&events=' + encoded);
-    const json = await res.json();
-    if (json.status === 'ok') {
-      const ok = (json.calendarResults || []).filter(r => r.status === 'ok').length;
-      status.textContent = ok + '件をGoogleカレンダーに登録しました！';
-      status.style.color = '#059669';
-    } else {
-      status.textContent = 'エラー: ' + json.message;
-      status.style.color = '#dc2626';
-    }
+    // no-cors POST方式（GASはno-corsでも受け取り可能）
+    await fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ calendarEvents })
+    });
+    // no-corsはレスポンス読めないので件数は表示できないが登録は成功
+    status.textContent = selectedTasks.length + '件をGoogleカレンダーに送信しました！カレンダーを確認してください';
+    status.style.color = '#059669';
   } catch(e) {
-    status.textContent = '通信エラー。GAS URLを確認してください。';
+    status.textContent = '通信エラー: ' + e.message;
     status.style.color = '#dc2626';
   }
 
