@@ -485,12 +485,8 @@ async function pushToCloud() {
   isSyncing = true;
   setSyncStatus('saving');
   try {
-    await fetch(GAS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tasks })
-    });
+    const encoded = encodeURIComponent(JSON.stringify(tasks));
+    await fetch(GAS_URL + '?action=save&tasks=' + encoded);
     setSyncStatus('saved');
   } catch(e) { setSyncStatus('error'); }
   isSyncing = false;
@@ -754,11 +750,8 @@ async function reflectToCalendar() {
   });
 
   try {
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ calendarEvents })
-    });
+    const encoded = encodeURIComponent(JSON.stringify(calendarEvents));
+    const res = await fetch(GAS_URL + '?action=calendar&events=' + encoded);
     const json = await res.json();
     if (json.status === 'ok') {
       const ok = (json.calendarResults || []).filter(r => r.status === 'ok').length;
