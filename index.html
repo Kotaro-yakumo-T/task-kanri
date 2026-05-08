@@ -728,6 +728,9 @@ async function reflectToCalendar() {
 
   const selectedIds = checked.map(c => c.id.replace('rc-',''));
   const selectedTasks = tasks.filter(t => selectedIds.includes(String(t.id)));
+  
+  // デバッグ
+  alert('チェック数:' + checked.length + ' / selectedIds:' + JSON.stringify(selectedIds) + ' / tasks件数:' + tasks.length + ' / 最初のtask.id型:' + typeof tasks[0].id + ' / selectedTasks:' + selectedTasks.length);
 
   btn.disabled = true;
   btn.textContent = '⏳ カレンダーに登録中...';
