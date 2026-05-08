@@ -726,8 +726,8 @@ async function reflectToCalendar() {
   const checked = [...document.querySelectorAll('#reflectTaskList input[type=checkbox]:checked')];
   if (checked.length === 0) { alert('タスクを選択してください'); return; }
 
-  const selectedIds = checked.map(c => parseInt(c.id.replace('rc-','')));
-  const selectedTasks = tasks.filter(t => selectedIds.includes(t.id));
+  const selectedIds = checked.map(c => c.id.replace('rc-',''));
+  const selectedTasks = tasks.filter(t => selectedIds.includes(String(t.id)));
 
   btn.disabled = true;
   btn.textContent = '⏳ カレンダーに登録中...';
